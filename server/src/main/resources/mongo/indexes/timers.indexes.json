@@ -1,0 +1,14 @@
+[
+  {
+    "name": "idx_timers_ownerId",
+    "fields": { "ownerId": 1 }
+  },
+  {
+    "name": "idx_timers_lastUsedAt_desc",
+    "fields": { "lastUsedAt": -1 }
+  },
+  {
+    "name": "idx_timers_recurrence_nextRunAt",
+    "fields": { "recurrence.nextRunAt": 1 }
+  }
+]

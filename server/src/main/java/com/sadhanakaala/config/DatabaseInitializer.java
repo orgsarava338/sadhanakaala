@@ -1,9 +1,15 @@
 package com.sadhanakaala.config;
 
 import jakarta.annotation.PostConstruct;
+
+import java.util.List;
+
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
+
+import com.sadhanakaala.component.FileLoader;
+import com.sadhanakaala.constants.DbConstants;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -13,40 +19,46 @@ import org.springframework.data.mongodb.core.index.Index;
 @ConditionalOnProperty(name = "sadhanakaala.db-init", havingValue = "true", matchIfMissing = true)
 public class DatabaseInitializer {
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
+    private final FileLoader fileLoader;
+
+    public DatabaseInitializer(MongoTemplate mongoTemplate, FileLoader fileLoader) {
+        this.mongoTemplate = mongoTemplate;
+        this.fileLoader = fileLoader;
+    }
 
     @PostConstruct
     public void init() {
-        createCollectionWithValidator("users", usersValidator());
-        createCollectionWithValidator("timers", timersValidator());
-        createCollectionWithValidator("timer_sessions", sessionsValidator());
+        createCollectionWithValidator(DbConstants.USERS_COLLECTION, DbConstants.USERS_VALIDATOR_PATH);
+        createCollectionWithValidator(DbConstants.TIMERS_COLLECTION, DbConstants.TIMERS_VALIDATOR_PATH);
+        createCollectionWithValidator(DbConstants.TIMER_SESSIONS_COLLECTION, DbConstants.TIMER_SESSIONS_VALIDATOR_PATH);
 
-        // Ensure indexes
-        mongoTemplate.indexOps("users").ensureIndex(new Index().on("username", org.springframework.data.domain.Sort.Direction.ASC).unique());
-        mongoTemplate.indexOps("users").ensureIndex(new Index().on("email", org.springframework.data.domain.Sort.Direction.ASC).unique());
-
-        mongoTemplate.indexOps("timers").ensureIndex(new Index().on("ownerId", org.springframework.data.domain.Sort.Direction.ASC));
-        mongoTemplate.indexOps("timers").ensureIndex(new Index().on("lastUsedAt", org.springframework.data.domain.Sort.Direction.DESC));
-        mongoTemplate.indexOps("timers").ensureIndex(new Index().on("recurrence.nextRunAt", org.springframework.data.domain.Sort.Direction.ASC));
-
-        mongoTemplate.indexOps("timer_sessions").ensureIndex(new Index().on("ownerId", org.springframework.data.domain.Sort.Direction.ASC));
-        mongoTemplate.indexOps("timer_sessions").ensureIndex(new Index().on("startedAt", org.springframework.data.domain.Sort.Direction.DESC));
-        mongoTemplate.indexOps("timer_sessions").ensureIndex(new Index().on("timerId", org.springframework.data.domain.Sort.Direction.ASC));
+        applyIndexes(DbConstants.USERS_COLLECTION, DbConstants.USERS_INDEXES_PATH);
+        applyIndexes(DbConstants.TIMERS_COLLECTION, DbConstants.TIMERS_INDEXES_PATH);
+        applyIndexes(DbConstants.TIMER_SESSIONS_COLLECTION, DbConstants.TIMER_SESSIONS_INDEXES_PATH);
     }
 
-    private void createCollectionWithValidator(@NonNull String collectionName, @NonNull String jsonSchema) {
+    private void createCollectionWithValidator(@NonNull String collectionName, @NonNull String validatorPath) {
         try {
+
+            String validatorDocument = fileLoader.loadJSON(validatorPath);
+
             // If collection doesn't exist, create with validator
             if (!mongoTemplate.collectionExists(collectionName)) {
-                Document command = Document.parse("{ create: \"" + collectionName + "\", validator: " + jsonSchema + ", validationLevel: \"strict\", validationAction: \"error\" }");
+                Document command = new Document("create", collectionName)
+                    .append("validator", validatorDocument)
+                    .append("validationLevel", "strict")
+                    .append("validationAction", "error");
                 if (command != null) {
                     mongoTemplate.executeCommand(command);
                     System.out.println("Created collection " + collectionName + " with JSON Schema validator.");
                 }
             } else {
                 // If exists, apply collMod to add/update validator
-                Document collMod = Document.parse("{ collMod: \"" + collectionName + "\", validator: " + jsonSchema + ", validationLevel: \"strict\", validationAction: \"error\" }");
+                Document collMod = new Document("collMod", collectionName)
+                    .append("validator", validatorDocument)
+                    .append("validationLevel", "strict")
+                    .append("validationAction", "error");
                 if (collMod != null) {
                     mongoTemplate.executeCommand(collMod);
                     System.out.println("Updated validator for collection " + collectionName);
@@ -57,23 +69,15 @@ public class DatabaseInitializer {
         }
     }
 
-    // The JSON schemas here should match the validators you already designed.
-    // For readability we embed shorter versions — replace with your complete JSON Schema strings if needed.
-    @NonNull
-    private String usersValidator() {
-        return "{ \"$jsonSchema\": { \"bsonType\": \"object\", \"required\": [\"username\",\"email\",\"createdAt\",\"updatedAt\"], " +
-                "\"properties\": { \"username\": { \"bsonType\": \"string\", \"minLength\": 3 }, \"email\": { \"bsonType\": \"string\" }, \"createdAt\": { \"bsonType\": \"date\" }, \"updatedAt\": { \"bsonType\": \"date\" } } } }";
-    }
+    private void applyIndexes(@NonNull String collectionName, @NonNull String indexesPath) {
+        try {
+           List<Index> indexes = fileLoader.loadIndexes(indexesPath);
 
-    @NonNull
-    private String timersValidator() {
-        return "{ \"$jsonSchema\": { \"bsonType\": \"object\", \"required\": [\"ownerId\",\"title\",\"durationSeconds\",\"createdAt\",\"updatedAt\"], " +
-                "\"properties\": { \"ownerId\": { \"bsonType\":\"objectId\" }, \"title\": { \"bsonType\":\"string\" }, \"durationSeconds\": { \"bsonType\": [\"int\",\"long\"], \"minimum\": 1 }, \"createdAt\": { \"bsonType\": \"date\" }, \"updatedAt\": { \"bsonType\": \"date\" } } } }";
-    }
-
-    @NonNull
-    private String sessionsValidator() {
-        return "{ \"$jsonSchema\": { \"bsonType\": \"object\", \"required\": [\"timerId\",\"ownerId\",\"startedAt\",\"createdAt\"], " +
-                "\"properties\": { \"timerId\": { \"bsonType\":\"objectId\" }, \"ownerId\": { \"bsonType\":\"objectId\" }, \"startedAt\": { \"bsonType\":\"date\" }, \"createdAt\": { \"bsonType\": \"date\" } } } }";
+        for (Index index : indexes) {
+            mongoTemplate.indexOps(collectionName).ensureIndex(index);
+        }
+        } catch (Exception ex) {
+            System.err.println("Failed to apply indexes for " + collectionName + ": " + ex.getMessage());
+        }
     }
 }

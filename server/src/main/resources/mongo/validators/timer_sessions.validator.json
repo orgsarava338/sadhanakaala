@@ -1,0 +1,70 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "title": "Timer sessions validation",
+    "required": ["timerId", "ownerId", "startedAt", "createdAt"],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "objectId"
+      },
+      "timerId": {
+        "bsonType": "objectId",
+        "description": "Reference to timers._id"
+      },
+      "ownerId": {
+        "bsonType": "objectId",
+        "description": "Reference to users._id"
+      },
+      "startedAt": {
+        "bsonType": "date",
+        "description": "When the session started"
+      },
+      "endedAt": {
+        "bsonType": ["date", "null"],
+        "description": "When the session ended (may be null until completion)"
+      },
+      "expectedDurationSeconds": {
+        "bsonType": ["int", "long", "null"],
+        "description": "Expected nominal duration (seconds)",
+        "minimum": 1
+      },
+      "actualDurationSeconds": {
+        "bsonType": ["int", "long", "null"],
+        "description": "Measured duration in seconds",
+        "minimum": 0
+      },
+      "completed": {
+        "bsonType": ["bool", "null"],
+        "description": "Whether user completed the session"
+      },
+      "interrupted": {
+        "bsonType": ["bool", "null"],
+        "description": "If the session was interrupted"
+      },
+      "notes": {
+        "bsonType": ["string", "null"],
+        "maxLength": 2000
+      },
+      "device": {
+        "bsonType": ["object", "null"],
+        "description": "Optional device/app metadata",
+        "additionalProperties": true,
+        "properties": {
+          "platform": {
+            "bsonType": ["string", "null"]
+          },
+          "appVersion": {
+            "bsonType": ["string", "null"]
+          }
+        }
+      },
+      "createdAt": {
+        "bsonType": "date"
+      },
+      "updatedAt": {
+        "bsonType": ["date", "null"]
+      }
+    }
+  }
+}

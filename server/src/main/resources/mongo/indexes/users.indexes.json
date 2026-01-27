@@ -1,0 +1,12 @@
+[
+  {
+    "name": "idx_users_username_unique",
+    "fields": { "username": 1 },
+    "unique": true
+  },
+  {
+    "name": "idx_users_email_unique",
+    "fields": { "email": 1 },
+    "unique": true
+  }
+]
