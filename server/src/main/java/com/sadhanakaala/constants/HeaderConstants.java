@@ -6,4 +6,7 @@ public final class HeaderConstants {
     public static final String X_REQUEST_ID = "X-Request-Id";
     public static final String AUTHORIZATION = "Authorization";
 
+    private HeaderConstants() {
+        // Prevent instantiation
+    }
 }

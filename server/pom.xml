@@ -39,6 +39,20 @@
       <version>1.18.28</version>
       <scope>provided</scope>
     </dependency>
+    <!-- MapStruct API -->
+    <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct</artifactId>
+        <version>1.5.5.Final</version>
+    </dependency>
+    <!-- Annotation processor -->
+    <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct-processor</artifactId>
+        <version>1.5.5.Final</version>
+        <scope>provided</scope>
+    </dependency>
+
     <!-- For convenience while testing -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

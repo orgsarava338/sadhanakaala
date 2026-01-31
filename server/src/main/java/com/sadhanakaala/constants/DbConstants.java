@@ -21,4 +21,7 @@ public final class DbConstants {
     public static final int DEFAULT_PAGE_SIZE = 20;
     public static final int MAX_PAGE_SIZE = 200;
 
+    private DbConstants() {
+        // Prevent instantiation
+    }
 }

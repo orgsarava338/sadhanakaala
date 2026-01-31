@@ -11,4 +11,8 @@ public final class AppConstants {
      * Common date/time format used across the app (if needed)
     */ 
     public static final String ISO_DATE_TIME = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
+    private AppConstants() {
+        // Prevent instantiation
+    }
 }
