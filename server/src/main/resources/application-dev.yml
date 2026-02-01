@@ -21,13 +21,6 @@ springdoc:
 server:
   port: 8080
 
-# Application-specific properties
-sadhanakaala:
-  db-init: true # Database initializer: create collections/validators/indexes on startup
-  defaults:
-    timezone: "Asia/Kolkata"
-    page-size: 20
-
 # Logging
 logging:
   level:

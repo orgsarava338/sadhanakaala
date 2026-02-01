@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.sadhanakaala.constants.ApiConstants;
+
 @Configuration
 @Profile("prod")
 public class SecurityConfigProd {
@@ -17,7 +19,9 @@ public class SecurityConfigProd {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(ApiConstants.AUTH_API).permitAll() // authentication endpoints
+                        .requestMatchers(ApiConstants.HEALTH_API).permitAll() // health check endpoint
+
                         .anyRequest().authenticated());
 
         return http.build();

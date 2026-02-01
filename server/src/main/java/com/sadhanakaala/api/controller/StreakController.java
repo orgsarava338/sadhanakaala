@@ -3,11 +3,13 @@ package com.sadhanakaala.api.controller;
 import com.sadhanakaala.api.dto.response.ApiResponse;
 import com.sadhanakaala.api.dto.response.Streak;
 import com.sadhanakaala.application.streak.UserStreakService;
+import com.sadhanakaala.constants.ApiConstants;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/streak")
+@RequestMapping(ApiConstants.STREAK_API)
 @RequiredArgsConstructor
 public class StreakController {
 

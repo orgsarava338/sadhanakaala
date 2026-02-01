@@ -66,7 +66,13 @@
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
       <version>2.5.0</version>
     </dependency>
-    
+    <!-- Firebase SDK -->
+    <dependency>
+      <groupId>com.google.firebase</groupId>
+      <artifactId>firebase-admin</artifactId>
+      <version>9.2.0</version>
+    </dependency>
+
     <!-- For convenience while testing -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

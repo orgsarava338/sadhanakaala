@@ -5,8 +5,8 @@ import com.sadhanakaala.api.dto.response.ApiResponse;
 import com.sadhanakaala.api.dto.response.Timer;
 import com.sadhanakaala.api.dto.response.TimerListItem;
 import com.sadhanakaala.application.timer.TimerService;
+import com.sadhanakaala.constants.ApiConstants;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.lang.NonNull;
@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/timers")
+@RequestMapping(ApiConstants.TIMERS_API)
 @RequiredArgsConstructor
 public class TimerController {
 
     private final TimerService timerService;
 
     @PostMapping
-    public ApiResponse<Timer> createTimer(@Valid @RequestBody @NonNull TimerDTO timerDTO) {
+    public ApiResponse<Timer> createTimer(@RequestBody @NonNull TimerDTO timerDTO) {
         Timer saved = timerService.createTimer(timerDTO);
         return ApiResponse.<Timer>builder().data(saved).build();
     }
@@ -40,7 +40,7 @@ public class TimerController {
     @PutMapping("/{id}")
     public ApiResponse<Timer> update(
         @PathVariable @NonNull String id, 
-            @Valid @RequestBody @NonNull TimerDTO updates,
+            @RequestBody @NonNull TimerDTO updates,
         @RequestHeader("X-User-Id") @NonNull String actorUserId) {
         Timer updated = timerService.updateTimer(id, updates, actorUserId);
         return ApiResponse.<Timer>builder().data(updated).build();

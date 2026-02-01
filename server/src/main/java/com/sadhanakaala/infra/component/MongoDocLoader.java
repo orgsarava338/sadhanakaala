@@ -31,8 +31,8 @@ public class MongoDocLoader {
             InputStream is = new ClassPathResource(path).getInputStream()) {
 
             Map<String, Object> map = objectMapper.readValue(is, new TypeReference<>() {});
-            if (map == null || map.isEmpty()) 
-                throw new IllegalStateException("Loaded file is null or empty: " + path);
+            // if (map == null || map.isEmpty())
+            // throw new IllegalStateException("Loaded file is null or empty: " + path);
             
             return new Document(map);
 

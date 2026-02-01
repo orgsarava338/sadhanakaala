@@ -11,4 +11,6 @@ public interface UserRepository extends MongoRepository<UserEntity, String> {
     String getUserTimeZoneById(String userId);
 
     Optional<UserEntity> findByEmail(String email);
+
+    Optional<UserEntity> findByUid(String uid);
 }

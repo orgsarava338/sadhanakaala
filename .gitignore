@@ -29,3 +29,5 @@ replay_pid*
 .env.*
 
 target/
+
+sadhanakaala-firebase-adminsdk-fbsvc.json

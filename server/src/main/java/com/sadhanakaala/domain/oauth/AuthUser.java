@@ -9,8 +9,9 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Builder
-public class OAuthUser {
+public class AuthUser {
 
+    private String uid;
     private String email;
     private String name;
     private String picture;

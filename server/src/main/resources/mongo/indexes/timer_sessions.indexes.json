@@ -1,14 +1,1 @@
-[
-  {
-    "name": "idx_timer_sessions_ownerId",
-    "fields": { "ownerId": 1 }
-  },
-  {
-    "name": "idx_timer_sessions_startedAt_desc",
-    "fields": { "startedAt": -1 }
-  },
-  {
-    "name": "idx_timer_sessions_timerId",
-    "fields": { "timerId": 1 }
-  }
-]
+[]
