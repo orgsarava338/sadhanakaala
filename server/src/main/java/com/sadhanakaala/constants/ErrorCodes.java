@@ -4,8 +4,11 @@ public class ErrorCodes {
 
     public static final String INVALID_REQUEST = "ERR_INVALID_REQUEST";
     public static final String INTERNAL_SERVER_ERROR = "ERR_INTERNAL_SERVER_ERROR";
-    public static final String ACCESS_DENIED = "ERR_ACCESS_DENIED";
     public static final String VALIDATION_ERROR = "ERR_VALIDATION_ERROR";
+    
+    // Authentication and Authorization Errors
+    public static final String AUTHENTICATION_FAILED = "ERR_AUTHENTICATION_FAILED";
+    public static final String ACCESS_DENIED = "ERR_ACCESS_DENIED";
 
     public static final String USER_NOT_FOUND = "ERR_USER_NOT_FOUND";
     public static final String USER_SIGNUP_ERROR = "ERR_USER_SIGNUP_ERROR";

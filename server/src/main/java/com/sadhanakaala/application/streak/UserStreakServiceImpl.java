@@ -30,7 +30,7 @@ public class UserStreakServiceImpl implements UserStreakService {
 
 		// 1️⃣ fetch sessions and user time zone
 		List<TimerSessionEntity> sessions = sessionRepository.findByOwnerIdOrderByStartedAtAsc(userId);
-		String userTimeZone = userRepository.getUserTimeZoneByUserId(userId);
+		String userTimeZone = userRepository.getUserTimeZoneById(userId);
 		ZoneId zone = userTimeZone != null ? ZoneId.of(userTimeZone) : ZoneId.systemDefault();
 
 		// 2️⃣ evaluate each session outcome

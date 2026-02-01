@@ -4,7 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.sadhanakaala.domain.auth.AuthProvider;
+import com.sadhanakaala.domain.oauth.AuthProvider;
 
 import java.time.Instant;
 import java.util.Set;
@@ -31,4 +31,7 @@ public class UserEntity {
     private Instant createdAt;
     private Instant lastLoginAt;
 
+    public void addProvider(AuthProvider provider) {
+        this.providers.add(provider);
+    }
 }

@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: local
+    active: prod
   data:
     mongodb:
       # Prefer supplying a full connection URI via the SPRING_DATA_MONGODB_URI environment variable.
@@ -11,12 +11,12 @@ spring:
       database: ${SPRING_DATA_MONGODB_DATABASE:sadhanakaala_db}
       username: ${SPRING_DATA_MONGODB_USERNAME}
       password: ${SPRING_DATA_MONGODB_PASSWORD}
-  
+
 springdoc:
   api-docs:
-    enabled: true
+    enabled: false
   swagger-ui:
-    enabled: true
+    enabled: false
 
 server:
   port: 8080

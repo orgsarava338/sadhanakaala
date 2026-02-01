@@ -2,6 +2,7 @@ package com.sadhanakaala.infra.config;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
 
+@Slf4j
 @Configuration
 @ConditionalOnProperty(name = "sadhanakaala.db-init", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
@@ -48,7 +50,9 @@ public class DatabaseInitializer {
                     .append("validationAction", "error");
                 if (command != null) {
                     mongoTemplate.executeCommand(command);
-                    System.out.println("Created collection " + collectionName + " with JSON Schema validator.");
+                    log.info(
+                        "DatabaseInitializer: createCollectionWithValidator(): Created collection {} with JSON Schema validator.",
+                        collectionName);
                 }
             } else {
                 // If exists, apply collMod to add/update validator
@@ -58,11 +62,15 @@ public class DatabaseInitializer {
                     .append("validationAction", "error");
                 if (collMod != null) {
                     mongoTemplate.executeCommand(collMod);
-                    System.out.println("Updated validator for collection " + collectionName);
+                    log.info(
+                        "DatabaseInitializer: createCollectionWithValidator(): Updated validator for collection {}",
+                        collectionName);
                 }
             }
         } catch (Exception ex) {
-            System.err.println("Failed to create/update validator for " + collectionName + ": " + ex.getMessage());
+          log.error(
+              "DatabaseInitializer: createCollectionWithValidator(): Failed to create/update validator for collection {}",
+              collectionName, ex);
         }
     }
 
@@ -74,7 +82,8 @@ public class DatabaseInitializer {
             mongoTemplate.indexOps(collectionName).ensureIndex(index);
         }
         } catch (Exception ex) {
-            System.err.println("Failed to apply indexes for " + collectionName + ": " + ex.getMessage());
+          log.error("DatabaseInitializer: applyIndexes(): Failed to apply indexes for collection {}", collectionName,
+              ex);
         }
     }
 }
