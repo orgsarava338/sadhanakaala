@@ -16,6 +16,6 @@
     </root>
 
     <!-- App-specific logging -->
-    <logger name="com.sadhanakaala" level="DEBUG"/>
+    <logger name="orgsarava338.sadhanakaala" level="DEBUG"/>
 
 </configuration>

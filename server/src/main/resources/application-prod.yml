@@ -25,7 +25,7 @@ server:
 logging:
   level:
     root: INFO
-    "[com.sadhanakaala]": DEBUG
+    "[orgsarava338.sadhanakaala]": DEBUG
     "[org.mongodb.driver]": WARN
 
 management:

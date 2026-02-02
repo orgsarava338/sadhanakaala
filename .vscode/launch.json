@@ -5,7 +5,7 @@
       "name": "Spring Boot-SadhanaKaalaApplication<sadhanakaala>",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "mainClass": "com.sadhanakaala.SadhanaKaalaApplication",
+      "mainClass": "orgsarava338.sadhanakaala.SadhanaKaalaApplication",
       "projectName": "sadhanakaala",
       "args": "",
       "envFile": "${workspaceFolder}/server/.env/.env.local"
