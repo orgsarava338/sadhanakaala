@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import orgsarava338.sadhanakaala.domain.user.Role;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -30,10 +31,14 @@ public class UserEntity {
     @Builder.Default
     private boolean active = true;
 
-    private Instant createdAt;
-    private Instant lastLoginAt;
+    @Builder.Default
+    private Instant createdAt = Instant.now();
+    @Builder.Default
+    private Instant lastLoginAt = Instant.now();
 
     public void addRole(Role role) {
+        if (this.roles == null)
+            this.roles = new HashSet<>();
         this.roles.add(role);
     }
 }

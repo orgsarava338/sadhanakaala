@@ -2,7 +2,10 @@ package orgsarava338.sadhanakaala.constants;
 
 public class ErrorCodes {
 
+    public static final String INTERNAL_ERROR = "ERR_INTERNAL_ERROR";
+
     public static final String INVALID_REQUEST = "ERR_INVALID_REQUEST";
+    public static final String INVALID_AUTH_TOKEN = "ERR_INVALID_AUTH_TOKEN";
     public static final String INTERNAL_SERVER_ERROR = "ERR_INTERNAL_SERVER_ERROR";
     public static final String VALIDATION_ERROR = "ERR_VALIDATION_ERROR";
 

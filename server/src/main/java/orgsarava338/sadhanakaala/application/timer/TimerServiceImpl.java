@@ -4,6 +4,7 @@ import orgsarava338.sadhanakaala.api.dto.mapper.TimerMapper;
 import orgsarava338.sadhanakaala.api.dto.request.TimerDTO;
 import orgsarava338.sadhanakaala.api.dto.response.Timer;
 import orgsarava338.sadhanakaala.api.dto.response.TimerListItem;
+import orgsarava338.sadhanakaala.constants.ErrorCodes;
 import orgsarava338.sadhanakaala.domain.timer.Segment;
 import orgsarava338.sadhanakaala.exception.AccessDeniedException;
 import orgsarava338.sadhanakaala.exception.BadRequestException;
@@ -34,7 +35,8 @@ public class TimerServiceImpl implements TimerService {
         if (!CollectionUtils.isEmpty(timerDTO.getSegments())) {
             long sum = timerDTO.getSegments().stream().mapToLong(Segment::getDurationSeconds).sum();
             if (sum != timerDTO.getDurationSeconds()) {
-                throw new BadRequestException("Sum of segment durations must equal durationSeconds");
+                throw new BadRequestException(ErrorCodes.INVALID_REQUEST,
+                        "Sum of segment durations must equal durationSeconds");
             }
         }
 
@@ -53,10 +55,10 @@ public class TimerServiceImpl implements TimerService {
     public Timer updateTimer(@NonNull String id, @NonNull TimerDTO updates, @NonNull String actorUserId) {
 
         TimerEntity existing = timerRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Timer not found: " + id));
+                .orElseThrow(() -> new NotFoundException(ErrorCodes.TIMER_NOT_FOUND, "Timer not found: " + id));
         // Only owner can update (sharedWith editing not allowed here)
         if (!existing.getOwnerId().equals(actorUserId)) {
-            throw new AccessDeniedException("Only owner can modify timer");
+            throw new AccessDeniedException(ErrorCodes.ACCESS_DENIED, "Only owner can modify timer");
         }
 
         // Apply allowed updates (simple merge; you can make it granular)
@@ -69,7 +71,8 @@ public class TimerServiceImpl implements TimerService {
         if (updates.getSegments() != null) {
             long sum = updates.getSegments().stream().mapToLong(Segment::getDurationSeconds).sum();
             if (sum != updates.getDurationSeconds()) {
-                throw new BadRequestException("Sum of segment durations must equal durationSeconds");
+                throw new BadRequestException(ErrorCodes.INVALID_REQUEST,
+                        "Sum of segment durations must equal durationSeconds");
             }
             existing.setSegments(updates.getSegments());
         }
@@ -90,7 +93,8 @@ public class TimerServiceImpl implements TimerService {
     @Override
     public Timer getTimer(@NonNull String id) {
         return timerMapper.toResponse(
-                timerRepository.findById(id).orElseThrow(() -> new NotFoundException("Timer not found: " + id)));
+                timerRepository.findById(id).orElseThrow(
+                        () -> new NotFoundException(ErrorCodes.TIMER_NOT_FOUND, "Timer not found: " + id)));
     }
 
     @Override
@@ -101,9 +105,9 @@ public class TimerServiceImpl implements TimerService {
     @Override
     public void deleteTimer(@NonNull String id, @NonNull String actorUserId) {
         TimerEntity existing = timerRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Timer not found: " + id));
+                .orElseThrow(() -> new NotFoundException(ErrorCodes.TIMER_NOT_FOUND, "Timer not found: " + id));
         if (!existing.getOwnerId().equals(actorUserId)) {
-            throw new AccessDeniedException("Only owner can delete timer");
+            throw new AccessDeniedException(ErrorCodes.ACCESS_DENIED, "Only owner can delete timer");
         }
         timerRepository.deleteById(id);
     }
@@ -112,8 +116,9 @@ public class TimerServiceImpl implements TimerService {
     public Timer incrementUsageAndTouch(@NonNull String timerId) {
         int updated = timerRepository.incrementUsageAndTouch(timerId, Instant.now());
         if (updated == 0)
-            throw new NotFoundException("Timer not found: " + timerId);
+            throw new NotFoundException(ErrorCodes.TIMER_NOT_FOUND, "Timer not found: " + timerId);
         return timerMapper.toResponse(timerRepository.findById(timerId)
-                .orElseThrow(() -> new NotFoundException("Timer not found after increment: " + timerId)));
+                .orElseThrow(() -> new NotFoundException(ErrorCodes.TIMER_NOT_FOUND,
+                        "Timer not found after increment: " + timerId)));
     }
 }

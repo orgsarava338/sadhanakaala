@@ -25,6 +25,7 @@ server:
 logging:
   level:
     root: INFO
+    # "[org.springframework.security]": DEBUG
     "[orgsarava338.sadhanakaala]": DEBUG
     "[org.mongodb.driver]": WARN
 

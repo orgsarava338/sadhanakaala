@@ -7,17 +7,24 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import lombok.RequiredArgsConstructor;
 import orgsarava338.sadhanakaala.constants.ApiConstants;
 import orgsarava338.sadhanakaala.constants.HeaderConstants;
 
 @Configuration
 @Profile("prod")
+@EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfigProd {
+
+    private final FirebaseAuthFilter firebaseAuthFilter;
 
     @Bean
     CorsConfigurationSource configurationSource() {
@@ -44,7 +51,9 @@ public class SecurityConfigProd {
                         .requestMatchers(ApiConstants.AUTH_API).permitAll() // authentication endpoints
                         .requestMatchers(ApiConstants.HEALTH_API).permitAll() // health check endpoint
 
-                        .anyRequest().authenticated());
+                        .anyRequest().authenticated())
+
+                .addFilterBefore(firebaseAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

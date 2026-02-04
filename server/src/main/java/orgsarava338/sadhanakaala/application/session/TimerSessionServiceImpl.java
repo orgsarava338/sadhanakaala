@@ -4,6 +4,7 @@ import orgsarava338.sadhanakaala.api.dto.mapper.TimerSessionMapper;
 import orgsarava338.sadhanakaala.api.dto.request.TimerSessionDTO;
 import orgsarava338.sadhanakaala.api.dto.response.TimerSession;
 import orgsarava338.sadhanakaala.application.timer.TimerService;
+import orgsarava338.sadhanakaala.constants.ErrorCodes;
 import orgsarava338.sadhanakaala.exception.AccessDeniedException;
 import orgsarava338.sadhanakaala.exception.BadRequestException;
 import orgsarava338.sadhanakaala.exception.NotFoundException;
@@ -40,15 +41,15 @@ public class TimerSessionServiceImpl implements TimerSessionService {
         String timerId = sessionDTO.getTimerId();
         String ownerId = sessionDTO.getOwnerId();
         if (timerId == null || !StringUtils.hasText(timerId))
-            throw new BadRequestException("timerId is required in the timer session");
+            throw new BadRequestException(ErrorCodes.INVALID_REQUEST, "timerId is required in the timer session");
         if (ownerId == null || !StringUtils.hasText(ownerId))
-            throw new BadRequestException("ownerId is required in the timer session");
+            throw new BadRequestException(ErrorCodes.INVALID_REQUEST, "ownerId is required in the timer session");
 
         TimerEntity timer = timerRepository.findById(timerId)
-                .orElseThrow(() -> new NotFoundException("Timer not found: " + timerId));
+                .orElseThrow(() -> new NotFoundException(ErrorCodes.SESSION_NOT_FOUND, "Timer not found: " + timerId));
         if (!timer.getOwnerId().equals(ownerId)
                 && (timer.getSharedWith() == null || !timer.getSharedWith().contains(ownerId))) {
-            throw new AccessDeniedException("User doesn't have access to timer");
+            throw new AccessDeniedException(ErrorCodes.ACCESS_DENIED, "User doesn't have access to timer");
         }
 
         TimerSessionEntity session = sessionMapper.toEntity(sessionDTO);
@@ -62,19 +63,19 @@ public class TimerSessionServiceImpl implements TimerSessionService {
     public TimerSession completeSession(@NonNull String sessionId, @NonNull TimerSessionDTO update,
             @NonNull String actorUserId) {
         if (!StringUtils.hasText(sessionId))
-            throw new BadRequestException("sessionId is can not be empty");
+            throw new BadRequestException(ErrorCodes.INVALID_REQUEST, "sessionId is can not be empty");
         if (!StringUtils.hasText(actorUserId))
-            throw new BadRequestException("actorUserId is can not be empty");
+            throw new BadRequestException(ErrorCodes.INVALID_REQUEST, "actorUserId is can not be empty");
 
         Optional<TimerSessionEntity> maybe = sessionRepository.findById(sessionId);
         if (maybe.isEmpty())
-            throw new NotFoundException("Session not found: " + sessionId);
+            throw new NotFoundException(ErrorCodes.SESSION_NOT_FOUND, "Session not found: " + sessionId);
         TimerSessionEntity session = maybe.get();
         String timerId = session.getTimerId();
         if (timerId == null || !StringUtils.hasText(timerId))
-            throw new BadRequestException("Session has invalid timerId");
+            throw new BadRequestException(ErrorCodes.INVALID_REQUEST, "Session has invalid timerId");
         if (!session.getOwnerId().equals(actorUserId))
-            throw new AccessDeniedException("Only session owner can complete it");
+            throw new AccessDeniedException(ErrorCodes.ACCESS_DENIED, "Only session owner can complete it");
 
         session.setEndedAt(update.getEndedAt() != null ? update.getEndedAt() : Instant.now());
         session.setActualDurationSeconds(update.getActualDurationSeconds() != null ? update.getActualDurationSeconds()
@@ -92,8 +93,9 @@ public class TimerSessionServiceImpl implements TimerSessionService {
     @Override
     public TimerSession getSession(@NonNull String sessionId) {
         if (!StringUtils.hasText(sessionId))
-            throw new BadRequestException("sessionId is can not be empty");
+            throw new BadRequestException(ErrorCodes.INVALID_REQUEST, "sessionId is can not be empty");
         return sessionMapper.toResponse(sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NotFoundException("Session not found: " + sessionId)));
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorCodes.SESSION_NOT_FOUND, "Session not found: " + sessionId)));
     }
 }

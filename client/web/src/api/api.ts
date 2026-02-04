@@ -1,14 +1,11 @@
 import axios from "axios";
 import { auth } from "../firebase/firebase";
+import CONFIG from "@/app/config";
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL + "/api/v1"
+const apiBaseUrl = CONFIG.API.BASE_URL + "/api/v1"
 
-const api = axios.create({
-  baseURL: apiBaseUrl,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+const api = axios.create({ baseURL: apiBaseUrl, headers: { "Content-Type": "application/json" }});
+const publicApi = axios.create({ baseURL: apiBaseUrl, headers: { "Content-Type": "application/json" }});
 
 // Attach Firebase token
 api.interceptors.request.use(async (config) => {
@@ -33,4 +30,6 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+export { api, publicApi };
+
+

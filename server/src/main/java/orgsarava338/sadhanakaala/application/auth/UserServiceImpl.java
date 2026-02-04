@@ -25,22 +25,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity loadOrCreateUser(FirebaseToken firebaseToken) {
-        log.info("firebase Token: {}", firebaseToken.toString());
-
-        return userRepository
+        UserEntity user = userRepository
                 .findByUid(firebaseToken.getUid())
                 .orElseGet(() -> {
-                    UserEntity user = UserEntity.builder()
+                    UserEntity createdUser = UserEntity.builder()
                             .email(firebaseToken.getEmail())
                             .uid(firebaseToken.getUid())
                             .displayName(firebaseToken.getName())
-                            .lastLoginAt(Instant.now())
-                            .createdAt(Instant.now())
+                            .photoUrl(firebaseToken.getPicture())
                             .build();
-                    user.addRole(Role.USER);
-
-                    return userRepository.save(user);
+                    log.info("user:{} , profile: {}", firebaseToken.getName(), firebaseToken.getPicture());
+                    createdUser.addRole(Role.USER);
+                    userRepository.save(createdUser);
+                    return createdUser;
                 });
+
+        return user;
     }
 
     @Override

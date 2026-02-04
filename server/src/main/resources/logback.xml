@@ -15,7 +15,6 @@
         <appender-ref ref="CONSOLE"/>
     </root>
 
-    <!-- App-specific logging -->
-    <logger name="orgsarava338.sadhanakaala" level="DEBUG"/>
+    <logger name="orgsarava338" level="DEBUG"/>
 
 </configuration>
