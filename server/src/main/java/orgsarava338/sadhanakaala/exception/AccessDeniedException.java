@@ -1,14 +1,8 @@
 package orgsarava338.sadhanakaala.exception;
 
-import lombok.Getter;
-
-@Getter
-public class AccessDeniedException extends RuntimeException {
-
-    private final String code;
+public class AccessDeniedException extends SadhanaKaalaException {
 
     public AccessDeniedException(String code, String message) {
-        super(message);
-        this.code = code;
+        super(code, message);
     }
 }

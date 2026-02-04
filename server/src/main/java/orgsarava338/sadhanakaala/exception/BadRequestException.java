@@ -1,14 +1,8 @@
 package orgsarava338.sadhanakaala.exception;
 
-import lombok.Getter;
-
-@Getter
-public class BadRequestException extends RuntimeException {
-
-    private final String code;
+public class BadRequestException extends SadhanaKaalaException {
 
     public BadRequestException(String code, String message) {
-        super(message);
-        this.code = code;
+        super(code, message);
     }
 }

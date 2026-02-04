@@ -1,4 +1,4 @@
-package orgsarava338.sadhanakaala.api.exception;
+package orgsarava338.sadhanakaala.exception.handlers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
