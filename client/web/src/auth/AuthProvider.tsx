@@ -1,12 +1,6 @@
 import authService from "@/api/auth.api";
 import { auth, googleProvider } from "@/firebase/firebase";
-import {
-    getRedirectResult,
-  onIdTokenChanged,
-  signInWithRedirect,
-  signOut,
-  type User as FirebaseUser,
-} from "firebase/auth";
+import { getRedirectResult, onIdTokenChanged, signInWithRedirect, signOut } from "firebase/auth";
 import { createContext, useEffect, useState } from "react";
 
 interface AuthContextType {

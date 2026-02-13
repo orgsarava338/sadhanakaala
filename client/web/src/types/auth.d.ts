@@ -3,18 +3,6 @@ enum Role {
   ADMIN,
 }
 
-interface User {
-  uid: string;
-  email: string;
-  name: string;
-  photoURL: string;
-  
-  roles: Role[];
-  active: boolean;
-  lastLoginAt: String;
-  createdAt: string;
-}
-
 interface ApiUser {
   uid: string;
   roles: Role[];
@@ -22,3 +10,13 @@ interface ApiUser {
   lastLoginAt: String;
   createdAt: string;
 }
+
+interface OAuthUser {
+  uid: string;
+  email: string;
+  name: string;
+  photoURL: string;
+}
+
+
+interface User extends ApiUser, OAuthUser {}
