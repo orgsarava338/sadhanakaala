@@ -10,7 +10,7 @@ public final class ApiConstants {
 
     public static final String TIMERS_API = API_V + "/timer";
     public static final String SESSIONS_API = API_V + "/session";
-    public static final String AUTH_API = API_V + "/auth";
+    public static final String USER_API = API_V + "/user";
     public static final String STREAK_API = API_V + "/streak";
 
     public static final String HEALTH_API = API_V + "/health";

@@ -1,6 +1,24 @@
+enum Role {
+  USER,
+  ADMIN,
+}
+
 interface User {
   uid: string;
-  name: string;
   email: string;
-  streak: number;
+  name: string;
+  photoURL: string;
+  
+  roles: Role[];
+  active: boolean;
+  lastLoginAt: String;
+  createdAt: string;
+}
+
+interface ApiUser {
+  uid: string;
+  roles: Role[];
+  active: boolean;
+  lastLoginAt: String;
+  createdAt: string;
 }

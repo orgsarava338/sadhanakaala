@@ -6,7 +6,7 @@ interface ButtonProps {
 }
 
 export default function Button({
-    classaName = "px-6 py-3 rounded-lg bg-black text-white hover:opacity-90 flex items-center gap-3", 
+    classaName, 
     disabled = false, 
     onClick, 
     children

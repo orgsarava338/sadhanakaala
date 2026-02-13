@@ -4,8 +4,11 @@ import CONFIG from "@/app/config";
 
 const apiBaseUrl = CONFIG.API.BASE_URL + "/api/v1"
 
-const api = axios.create({ baseURL: apiBaseUrl, headers: { "Content-Type": "application/json" }});
-const publicApi = axios.create({ baseURL: apiBaseUrl, headers: { "Content-Type": "application/json" }});
+const api = axios.create({ 
+  baseURL: apiBaseUrl, 
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true,
+});
 
 // Attach Firebase token
 api.interceptors.request.use(async (config) => {
@@ -21,15 +24,27 @@ api.interceptors.request.use(async (config) => {
 
 // Handle auth errors globally
 api.interceptors.response.use(
-  (res) => res,
-  (error) => {
-    if (error.response?.status === 401) {
-      console.warn("Unauthorized – token expired?");
+  (res) => {
+    const body = res.data;
+
+    if (body?.errors?.length) {
+      return Promise.reject({ type: "BUSINESS", errors: body.errors })
     }
-    return Promise.reject(error);
+
+    return body;
+  },
+  (error) => {
+   if (!error.response) {
+      return Promise.reject({type: "NETWORK", message: "Network error. Check connection"});
+    }
+
+    const status = error.response.status;
+    const body = error.response.data;
+
+    return Promise.reject({type: "HTTP", status, errors: body?.errors || body});
   }
 );
 
-export { api, publicApi };
+export { api };
 
 

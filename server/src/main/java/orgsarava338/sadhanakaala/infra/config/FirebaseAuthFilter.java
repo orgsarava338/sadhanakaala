@@ -3,16 +3,14 @@ package orgsarava338.sadhanakaala.infra.config;
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+
 import orgsarava338.sadhanakaala.application.auth.UserService;
 import orgsarava338.sadhanakaala.constants.HeaderConstants;
 import orgsarava338.sadhanakaala.persistence.entity.UserEntity;
@@ -23,6 +21,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import orgsarava338.sadhanakaala.application.auth.FirebaseAuthUtil;
+import orgsarava338.sadhanakaala.constants.ApiConstants;
 
 @Slf4j
 @Component
@@ -30,44 +30,29 @@ import lombok.extern.slf4j.Slf4j;
 public class FirebaseAuthFilter extends OncePerRequestFilter {
 
     private final UserService userService;
+    private final FirebaseAuthUtil firebaseAuthUtil;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-
         String path = request.getRequestURI();
+        String header = request.getHeader(HeaderConstants.AUTHORIZATION);
 
-        // return request.getMethod().equalsIgnoreCase("OPTIONS")
-        return path.startsWith("/api/v1/auth/")
-                || path.startsWith("/api/v1/health");
+        return path.startsWith(ApiConstants.HEALTH_API) || header == null || !header.startsWith("Bearer ");
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        String header = request.getHeader(HeaderConstants.AUTHORIZATION);
+        String token = request.getHeader(HeaderConstants.AUTHORIZATION);
+        FirebaseToken firebaseToken = firebaseAuthUtil.decodeToken(token);
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            chain.doFilter(request, response);
-            return;
-        }
+        UserEntity user = userService.loadOrCreateUser(firebaseToken);
+        List<GrantedAuthority> authorities = userService.loadAuthorities(user);
 
-        String token = header.substring(7);
-
-        try {
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
-
-            UserEntity user = userService.loadOrCreateUser(decodedToken);
-            List<GrantedAuthority> authorities = userService.loadAuthorities(user);
-
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, authorities);
-
-            SecurityContextHolder.getContext().setAuthentication(auth);
-
-        } catch (FirebaseAuthException ex) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            return;
-        }
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, authorities);
+        
+        SecurityContextHolder.getContext().setAuthentication(auth);
 
         chain.doFilter(request, response);
     }

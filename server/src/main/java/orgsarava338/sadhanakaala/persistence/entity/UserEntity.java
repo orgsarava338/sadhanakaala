@@ -1,14 +1,17 @@
 package orgsarava338.sadhanakaala.persistence.entity;
 
-import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import orgsarava338.sadhanakaala.domain.user.Role;
-
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import orgsarava338.sadhanakaala.domain.user.Role;
 
 @Data
 @NoArgsConstructor
@@ -21,10 +24,6 @@ public class UserEntity {
     private String id;
 
     private String uid;
-
-    private String displayName;
-    private String email;
-    private String photoUrl;
 
     private Set<Role> roles;
 

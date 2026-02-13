@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -46,11 +47,14 @@ public class SecurityConfigProd {
 
         http
                 .cors(Customizer.withDefaults()) // enable cors
+                .headers(headers -> headers
+                    .crossOriginOpenerPolicy(coop -> 
+                        coop.policy(CrossOriginOpenerPolicyHeaderWriter.CrossOriginOpenerPolicy.SAME_ORIGIN_ALLOW_POPUPS)
+                    )
+                )
                 .csrf(csrf -> csrf.disable()) // disable csrf
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(ApiConstants.AUTH_API).permitAll() // authentication endpoints
-                        .requestMatchers(ApiConstants.HEALTH_API).permitAll() // health check endpoint
-
+                        .requestMatchers(ApiConstants.HEALTH_API + "/**").permitAll() // health check endpoint
                         .anyRequest().authenticated())
 
                 .addFilterBefore(firebaseAuthFilter, UsernamePasswordAuthenticationFilter.class);

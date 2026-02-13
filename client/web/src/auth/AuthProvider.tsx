@@ -1,70 +1,103 @@
 import authService from "@/api/auth.api";
 import { auth, googleProvider } from "@/firebase/firebase";
-import { onAuthStateChanged, signInWithPopup, signOut, type User as FirebaseUser } from "firebase/auth";
+import {
+    getRedirectResult,
+  onIdTokenChanged,
+  signInWithRedirect,
+  signOut,
+  type User as FirebaseUser,
+} from "firebase/auth";
 import { createContext, useEffect, useState } from "react";
 
-interface AuthContext {
+interface AuthContextType {
   user: User | null;
   loading: boolean;
-  loginWithGoogle: () => Promise<void>;
+  loginWithGoogle: () => Promise<boolean>;
   logout: () => Promise<void>;
 }
 
 interface AuthProviderProps {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export const AuthContext = createContext<AuthContext | null>(null);
+export const AuthContext = createContext<AuthContextType | null>(null);
 
-export default function AuthProvider({children}: AuthProviderProps) {
+export default function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        return onAuthStateChanged(auth, async (firebaseUser) => {
-            try {
-                if (!firebaseUser || firebaseUser.uid === user?.uid) return;                
-
-                setLoading(true);
-                await loadUser(firebaseUser);
-            } catch (error) {
-                throw error;
-            } finally {
-                setLoading(false);
-            }
+  useEffect(() => {
+    getRedirectResult(auth)
+        .then(result => {
+          console.log("Redirect result:", result);
         })
-    }, [])
+        .catch(error => {
+          console.error("Redirect error:", error);
+        });
 
-    const loginWithGoogle = async () => {
-        try {
-            setLoading(true);
-            const result = await signInWithPopup(auth, googleProvider);
-            await loadUser(result.user);
-        } catch (error) {
-            throw error
-        } finally {
-            setLoading(false);
-        }
-    }
-    
-    const logout = async () => {
-        await signOut(auth);
-        await clearUser();
-    }
-    
-    const loadUser = async (user?: FirebaseUser | null) => {
-        if(!user) return;
-        const backendUser = await authService.login();
-        setUser(backendUser);
-    }
-    
-    const clearUser = async () => {
-        await authService.logout();
+    const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
+        console.log("on token changed", firebaseUser);
+
+      if (!firebaseUser) {
+        localStorage.removeItem("auth_uid");
         setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      const storedUid = localStorage.getItem("auth_uid");
+
+      try {
+        if (storedUid === firebaseUser.uid) {
+          const me = await authService.getMe();
+          setUser({
+            ...me, 
+            name: firebaseUser.displayName ?? "",
+            email: firebaseUser.email ?? "",
+            photoURL: firebaseUser.photoURL ?? "",
+          });
+        } 
+
+        else {
+          const loggedInUser = await authService.login();
+          localStorage.setItem("auth_uid", firebaseUser.uid);
+          setUser({
+            ...loggedInUser,
+            name: firebaseUser.displayName ?? "",
+            email: firebaseUser.email ?? "",
+            photoURL: firebaseUser.photoURL ?? "",
+          });
+        }
+      } catch (error) {
+        console.error("Auth sync failed:", error);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const loginWithGoogle = async (): Promise<boolean> => {
+    try {
+      await signInWithRedirect(auth, googleProvider);
+      return true;
+    } catch (error) {
+      console.error("Login failed:", error);
+      return false;
     }
-    
-    return <AuthContext.Provider value={{ user, loading, loginWithGoogle, logout }}>
-        {children}
+  };
+
+  const logout = async () => {
+    await signOut(auth);
+    localStorage.removeItem("auth_uid");
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, loading, loginWithGoogle, logout }}>
+      {children}
     </AuthContext.Provider>
+  );
 }

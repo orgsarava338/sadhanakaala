@@ -5,12 +5,12 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -47,10 +47,14 @@ public class SecurityConfigDEV {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults()) // enable cors
+                .headers(headers -> headers
+                    .crossOriginOpenerPolicy(coop -> 
+                        coop.policy(CrossOriginOpenerPolicyHeaderWriter.CrossOriginOpenerPolicy.SAME_ORIGIN_ALLOW_POPUPS)
+                    )
+                )
                 .csrf(csrf -> csrf.disable()) // disable CSRF for dev purposes
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // swagger endpoints
-                        .requestMatchers(ApiConstants.AUTH_API + "/**").permitAll() // authentication endpoints
                         .requestMatchers(ApiConstants.HEALTH_API + "/**").permitAll() // health check endpoint
                         .anyRequest().authenticated()) // all other endpoints require authentication
                 .httpBasic(basic -> basic.disable()) // disable default basic auth popup

@@ -1,33 +1,27 @@
 import { api } from "./api";
 import Log from "@/decorators/log";
+import { handleApiError } from "./error.handler";
 
 class AuthService {
 
   @Log
-  async login(): Promise<User> {
+  async login(): Promise<ApiUser> {
     try {
-      const res = await api.post("/auth/login");
+      const res = await api.post("/user/login");
       return res.data;
     } catch (error) {
+      handleApiError(error);
       throw error;
     }
   }
 
   @Log
-  async logout(): Promise<void> {
+  async getMe(): Promise<ApiUser> {
     try {
-      await api.post("/auth/logout");
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Log
-  async getMe(): Promise<User> {
-    try {
-      const res = await api.get("/auth/me");
+      const res = await api.get(`/user/me`);
       return res.data;
     } catch (error) {
+      handleApiError(error);
       throw error;
     }
   };
