@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleNotFound(NotFoundException e) {
 
-        log.error("Error: {}", e);
+        log.error("✗ Error: {}", e);
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGlobalException(Exception e) {
 
-        log.error("Error: {}", e);
+        log.error("✗ Error: {}", e);
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -17,7 +17,7 @@ public class ApiExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadRequest(BadRequestException e) {
 
-        log.error("Error: {}", e);
+        log.error("✗ Error: {}", e);
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)

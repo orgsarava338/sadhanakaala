@@ -38,39 +38,26 @@ public class DatabaseInitializer {
     }
 
     private void createCollectionWithValidator(@NonNull String collectionName, @NonNull String validatorPath) {
+        String action = "Initialize";
         try {
 
             Document validatorDocument = mongoDocLoader.loadValidatorDocument(validatorPath);
 
-            // If collection doesn't exist, create with validator
-            if (!mongoTemplate.collectionExists(collectionName)) {
-                Document command = new Document("create", collectionName)
-                        .append("validator", validatorDocument)
-                        .append("validationLevel", "strict")
-                        .append("validationAction", "error");
-                if (command != null) {
-                    mongoTemplate.executeCommand(command);
-                    log.info(
-                            "DatabaseInitializer: createCollectionWithValidator(): Created collection {} with JSON Schema validator.",
-                            collectionName);
-                }
-            } else {
-                // If exists, apply collMod to add/update validator
-                Document collMod = new Document("collMod", collectionName)
-                        .append("validator", validatorDocument)
-                        .append("validationLevel", "strict")
-                        .append("validationAction", "error");
-                if (collMod != null) {
-                    mongoTemplate.executeCommand(collMod);
-                    log.info(
-                            "DatabaseInitializer: createCollectionWithValidator(): Updated validator for collection {}",
-                            collectionName);
-                }
+            boolean isCollectionExists = mongoTemplate.collectionExists(collectionName);
+            String documentKey = isCollectionExists ? "collMod" : "create";
+            action = isCollectionExists ? "Update" : "Create";
+
+            Document command = new Document(documentKey, collectionName)
+                    .append("validator", validatorDocument)
+                    .append("validationLevel", "strict")
+                    .append("validationAction", "error");
+            if (command != null) {
+                mongoTemplate.executeCommand(command);
+                log.info("✓ {} collection {} with JSON Schema validator is successful.", action, collectionName);
             }
+
         } catch (Exception ex) {
-            log.error(
-                    "DatabaseInitializer: createCollectionWithValidator(): Failed to create/update validator for collection {}",
-                    collectionName, ex);
+            log.error("✗ Failed to {} validator for collection {}", action, collectionName, ex);
         }
     }
 
@@ -82,8 +69,7 @@ public class DatabaseInitializer {
                 mongoTemplate.indexOps(collectionName).ensureIndex(index);
             }
         } catch (Exception ex) {
-            log.error("DatabaseInitializer: applyIndexes(): Failed to apply indexes for collection {}", collectionName,
-                    ex);
+            log.error("✗ Failed to apply indexes for collection {}", collectionName, ex);
         }
     }
 }

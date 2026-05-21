@@ -11,7 +11,7 @@ spring:
       database: ${SPRING_DATA_MONGODB_DATABASE:sadhanakaala_db}
       username: ${SPRING_DATA_MONGODB_USERNAME}
       password: ${SPRING_DATA_MONGODB_PASSWORD}
-  
+
 springdoc:
   api-docs:
     enabled: true
@@ -20,6 +20,10 @@ springdoc:
 
 server:
   port: 8080
+
+# Firebase Configuration
+firebase:
+  credentials-path: ${FIREBASE_CREDENTIALS_PATH:sadhanakaala-firebase-adminsdk-fbsvc.json}
 
 # Logging
 logging:

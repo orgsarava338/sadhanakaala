@@ -19,7 +19,7 @@ public class AuthExceptionHandler {
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<ApiResponse<Void>> handleAuth(AuthException e) {
 
-        log.error("Auth error", e);
+        log.error("✗ Auth error", e);
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
@@ -29,7 +29,7 @@ public class AuthExceptionHandler {
     @ExceptionHandler(FirebaseAuthException.class)
     public ResponseEntity<ApiResponse<Void>> handleFirebase(FirebaseAuthException e) {
 
-        log.error("Firebase auth error", e);
+        log.error("✗ Firebase auth error", e);
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
