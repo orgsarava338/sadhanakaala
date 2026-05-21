@@ -1,4 +1,4 @@
-import { api } from "./api";
+import api from "./api";
 import Log from "@/decorators/log";
 import { handleApiError } from "./error.handler";
 

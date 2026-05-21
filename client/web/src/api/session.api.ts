@@ -5,10 +5,7 @@ export const startSession = async (timerId: string) => {
   return res.data;
 };
 
-export const stopSession = async (
-  sessionId: string,
-  actualDuration: number
-) => {
+export const stopSession = async (sessionId: string,actualDuration: number) => {
   const res = await api.post(`/sessions/${sessionId}/stop`, {
     actualDuration,
   });
