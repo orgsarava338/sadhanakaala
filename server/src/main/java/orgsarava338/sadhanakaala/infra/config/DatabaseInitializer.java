@@ -66,7 +66,7 @@ public class DatabaseInitializer {
             List<Index> indexes = mongoDocLoader.loadIndexes(indexesPath);
 
             for (Index index : indexes) {
-                mongoTemplate.indexOps(collectionName).ensureIndex(index);
+                mongoTemplate.indexOps(collectionName).createIndex(index);
             }
         } catch (Exception ex) {
             log.error("✗ Failed to apply indexes for collection {}", collectionName, ex);

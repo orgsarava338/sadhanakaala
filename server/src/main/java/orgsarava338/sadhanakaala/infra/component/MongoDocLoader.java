@@ -28,12 +28,9 @@ public class MongoDocLoader {
     @NonNull
     public Document loadValidatorDocument(@NonNull String path) {
         try (
-                InputStream is = new ClassPathResource(path).getInputStream()) {
-
-            Map<String, Object> map = objectMapper.readValue(is, new TypeReference<>() {
+            InputStream is = new ClassPathResource(path).getInputStream()) {
+                Map<String, Object> map = objectMapper.readValue(is, new TypeReference<>() {
             });
-            // if (map == null || map.isEmpty())
-            // throw new IllegalStateException("Loaded file is null or empty: " + path);
 
             return new Document(map);
 
@@ -58,8 +55,13 @@ public class MongoDocLoader {
                     index.named((String) raw.get("name"));
 
                 // fields
-                Map<String, Integer> fields = (Map<String, Integer>) raw.get("fields");
-                fields.forEach((field, dir) -> index.on(field, dir == 1 ? Sort.Direction.ASC : Sort.Direction.DESC));
+                Map<String, Object> fields = objectMapper.convertValue(raw.get("fields"), new TypeReference<Map<String, Object>>() {});
+                fields.forEach((field, dirObj) -> {
+                    int dir = dirObj instanceof Number 
+                        ? ((Number) dirObj).intValue()
+                        : Integer.parseInt(dirObj.toString());
+                    index.on(field, dir == 1 ? Sort.Direction.ASC : Sort.Direction.DESC);
+                });
 
                 // unique
                 if (Boolean.TRUE.equals(raw.get("unique")))
